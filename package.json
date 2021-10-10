@@ -13,7 +13,11 @@
     "@discordjs/rest": "^0.1.0-canary.0",
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.2.0",
-    "nodemon": "^2.0.13"
+    "generate-password": "^1.6.1",
+    "install": "^0.13.0",
+    "npm": "^8.0.0",
+    "sequelize": "^6.7.0",
+    "sqlite3": "^5.0.2"
   },
   "devDependencies": {
     "@types/node": "^16.10.3"

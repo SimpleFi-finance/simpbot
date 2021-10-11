@@ -1,8 +1,11 @@
 const fs = require('fs');
 const {Client, Collection, Intents}  = require('discord.js')
-const { token } = require('./config.json');
+const { token, adminPrefix } = require('./config.json');
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const myIntents = new Intents();
+myIntents.add(Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES);
+
+const client = new Client({ intents: myIntents, partials: ['CHANNEL'] });
 
 client.commands = new Collection();
 
@@ -22,6 +25,7 @@ for (const file of eventFiles) {
 	}
 }
 
+
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
 
@@ -31,6 +35,8 @@ client.on('interactionCreate', async interaction => {
 
 	try {
 		await command.execute(interaction);
+    return;
+
 	} catch (error) {
 		console.error(error);
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });

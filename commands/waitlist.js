@@ -7,7 +7,7 @@ const { accessSize } = require('../config.json');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('waitlist')
-		.setDescription('Adds you to beta waitlist'),
+		.setDescription('Adds you to waitlist and tells you your position'),
 
 	async execute(interaction) {
     //Set correct channel id for users to create interaction

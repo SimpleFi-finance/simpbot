@@ -1,10 +1,10 @@
-const { Tags } = require('../db');
+const { Users } = require('../db');
 
 module.exports = {
 	name: 'ready',
 	once: true,
 	execute(client) {
-    Tags.sync({ force: true });
+    Users.sync({ force: true });
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 	},
 };

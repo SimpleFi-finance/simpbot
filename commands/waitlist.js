@@ -1,5 +1,4 @@
-const fs = require('fs');
-const { Tags } = require('../db');
+const { Users } = require('../db');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const generator = require('generate-password');
 
@@ -19,13 +18,13 @@ module.exports = {
     }
 
     const {username, discriminator, id} = interaction.user;
-    // equivalent to: SELECT * FROM tags WHERE name = 'tagName' LIMIT 1;
+    // equivalent to: SELECT * FROM users WHERE name = 'handle' LIMIT 1;
 
     try {
-      const tag = await Tags.findOne({ where: { handle: username + discriminator } });
+      const user = await Users.findOne({ where: { handle: username + discriminator } });
 
       // Deal with user who already registered
-      if (tag) {
+      if (user) {
         const userPosition = tag.dataValues.id;
 
         if (userPosition <= accessSize) {
@@ -41,8 +40,8 @@ module.exports = {
           length: 6,
           numbers: true
         });
-        // register user on DB - equivalent to: INSERT INTO tags (name, description, username) values (?, ?, ?);
-        const tag = await Tags.create({
+        // register user on DB - equivalent to: INSERT INTO users (handle, userId, passcode) values (?, ?, ?);
+        const tag = await Users.create({
           handle: `${username}${discriminator}`,
           userId: id,
           passcode: passcode
@@ -51,7 +50,12 @@ module.exports = {
         const userPosition = tag.dataValues.id;
 
         if (userPosition <= accessSize) {
-          await interaction.user.send(`You've been authorised. Your access code is ${passcode}`);
+          const betaRole = await interaction.guild.roles.cache.find(r => r.name === 'beta tester');
+          //give user access to beta-testers channel
+          await interaction.member.roles.add(betaRole);
+          await interaction.user.send(
+            "You've been authorised. Your access code is " + passcode +
+            "\nYou now have access to the beta-testers channel. Please give us your feedback!");
           await interaction.reply(`Hi ${interaction.user}, you're one of the lucky ones! Check your DMs 👀`)
         } else {
           await interaction.user.send(`You're on the waiting list and your position is ${userPosition - accessSize}`);

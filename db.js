@@ -6,7 +6,7 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
 	storage: process.env.DB_STORAGE
 });
 
-const Tags = sequelize.define('tags', {
+const Users = sequelize.define('users', {
 	handle: {
 		type: Sequelize.STRING,
 		unique: true,
@@ -18,7 +18,9 @@ const Tags = sequelize.define('tags', {
 	passcode: Sequelize.STRING,
 });
 
+// const accessSize
+
 module.exports = {
-  Tags,
+  Users,
   Op
 }

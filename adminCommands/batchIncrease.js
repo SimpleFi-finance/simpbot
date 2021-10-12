@@ -1,4 +1,4 @@
-const { Tags, Op } = require('../db');
+const { Users, Op } = require('../db');
 const adminCheck = require('../helpers/adminCommandCheck');
 
 let accessSize = process.env.ACCESS_SIZE;
@@ -20,7 +20,7 @@ module.exports = {
         return;
       }
 
-      const newUsers = await Tags.findAll({
+      const newUsers = await Users.findAll({
         where: {
           id: {
             [Op.between]: [accessSize +1, newAccessSize]

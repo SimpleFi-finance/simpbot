@@ -1,7 +1,5 @@
-const { Users } = require('../db');
+const { Users, Lists } = require('../db');
 const adminCheck = require('../helpers/adminCommandCheck');
-
-let accessSize = process.env.ACCESS_SIZE;
 
 module.exports = {
   name: 'get-waitlist',
@@ -15,8 +13,9 @@ module.exports = {
     }
 
     try {
-      const listSize = await Users.findAll();
-      message.author.send('There are ' + listSize.length + ' people in the list \n and the access size is ' + accessSize);
+      const waitlist = await Lists.findOne({where: {name: process.env.WAITLIST_NAME}});
+      const usersInlist = await Users.findAll();
+      message.author.send('There are ' + usersInlist.length + ' people in the list \n and the access size is ' + waitlist.dataValues.size);
       return;
     }
     catch(err) {

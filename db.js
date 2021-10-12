@@ -16,7 +16,6 @@ const Users = sequelize.define('users', {
     unique: true,
   },
 	passcode: Sequelize.STRING,
-  lastAccess: Sequelize.BOOLEAN
 });
 
 const Lists = sequelize.define('lists', {

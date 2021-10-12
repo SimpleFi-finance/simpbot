@@ -26,10 +26,10 @@ module.exports = {
 
       // Deal with user who already registered
       if (user) {
-        const userPosition = tag.dataValues.id;
+        const userPosition = user.dataValues.id;
 
         if (userPosition <= accessSize) {
-          await interaction.user.send(`You already have access and your code is ${tag.dataValues.passcode}`)
+          await interaction.user.send(`You already have access and your code is ${user.dataValues.passcode}`)
           await interaction.reply(`${interaction.user} you already have access silly! Check your DMs.`);
         } else {
           await interaction.user.send(`You're on the waiting list and your position is ${userPosition - accessSize}`)
@@ -42,19 +42,20 @@ module.exports = {
           numbers: true
         });
         // register user on DB - equivalent to: INSERT INTO users (handle, userId, passcode) values (?, ?, ?);
-        const tag = await Users.create({
+        const newUser = await Users.create({
           handle: `${username}${discriminator}`,
           userId: id,
           passcode: passcode
         });
 
-        const userPosition = tag.dataValues.id;
+        const userPosition = newUser.dataValues.id;
 
         if (userPosition <= accessSize) {
           const betaRole = await interaction.guild.roles.cache.find(r => r.name === 'beta tester');
-          //give user access to beta-testers channel
+          
+          //give the new user access to beta-testers channel
           await interaction.member.roles.add(betaRole);
-          await interaction.user.send(
+          await interaction.newUser.send(
             "You've been authorised. Your access code is " + passcode +
             "\nYou now have access to the beta-testers channel. Please give us your feedback!");
           await interaction.reply(`Hi ${interaction.user}, you're one of the lucky ones! Check your DMs 👀`)

@@ -1,13 +1,13 @@
 const { Tags } = require('../db');
-const { accessSize } = require('../config.json');
 const adminCheck = require('../helpers/adminCommandCheck');
+
+let accessSize = process.env.ACCESS_SIZE;
 
 module.exports = {
   name: 'get-list',
 	description: 'Get waitlist info',
 
 	async execute(message) {
-    // console.log(' ---> message from getlist', message.guild.roles);
     const userIsAdmin = await adminCheck(message);
     if (!userIsAdmin) {
       message.author.send('Tut tut')

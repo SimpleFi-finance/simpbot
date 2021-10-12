@@ -2,7 +2,8 @@ const fs = require('fs');
 const { Tags } = require('../db');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const generator = require('generate-password');
-const { accessSize, waitListChannel } = require('../config.json');
+
+let accessSize = process.env.ACCESS_SIZE;
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -12,7 +13,7 @@ module.exports = {
 	async execute(interaction) {
 
     //Set correct channel id for users to create interaction
-    if (interaction.channelId !== '896787466055467048') {
+    if (interaction.channelId !== process.env.WAITLIST_CHANNEL) {
       await interaction.reply(`Only use this command in the waitlist channel`);
       return;
     }

@@ -1,6 +1,7 @@
 const { Tags, Op } = require('../db');
-let { accessSize } = require('../config.json');
 const adminCheck = require('../helpers/adminCommandCheck');
+
+let accessSize = process.env.ACCESS_SIZE;
 
 module.exports = {
   name: 'batch-increase',

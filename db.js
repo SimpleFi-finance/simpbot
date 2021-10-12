@@ -16,11 +16,22 @@ const Users = sequelize.define('users', {
     unique: true,
   },
 	passcode: Sequelize.STRING,
+  lastAccess: Sequelize.BOOLEAN
 });
 
-// const accessSize
+const Lists = sequelize.define('lists', {
+  name: {
+    type: Sequelize.STRING,
+		unique: true,
+  },
+  size: {
+    type: Sequelize.INTEGER,
+    allowNull: false
+  }
+});
 
 module.exports = {
   Users,
+  Lists,
   Op
 }

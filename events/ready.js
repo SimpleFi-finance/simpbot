@@ -1,10 +1,25 @@
-const { Users } = require('../db');
+const { Users, Lists } = require('../db');
 
 module.exports = {
 	name: 'ready',
 	once: true,
-	execute(client) {
-    Users.sync({ force: true });
+	async execute(client) {
+    await Users.sync({ force: true });
+    await Lists.sync();
 		console.log(`Ready! Logged in as ${client.user.tag}`);
+    const waitlist = await Lists.findOne({ where: { name: process.env.WAITLIST_NAME } });
+    console.log(`${waitlist.dataValues.name} exists and has initial size ${waitlist.dataValues.size}`);
+    if (!waitlist) {
+      try {
+        const newWaitlist = await Lists.create({
+          name: process.env.WAITLIST_NAME,
+          size: Number(process.env.ACCESS_SIZE)
+        });
+        console.log(`${newWaitlist.dataValues.name} has been created with initial size ${newWaitlist.dataValues.size}`);
+
+      } catch (err) {
+        console.error('Waitlist initialisation error: ', err);
+      }
+    }
 	},
 };

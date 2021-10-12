@@ -18,7 +18,7 @@ module.exports = {
       newAccessSize = parseInt(newAccessSize);
       
       if (newAccessSize <= currAccessSize) {
-        message.author.send(`You can only increase the access list. Currently it is ${accessSize}`);
+        message.author.send(`You can only increase the access list. Currently it is ${currAccessSize}`);
         return;
       }
 

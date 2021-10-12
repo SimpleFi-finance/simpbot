@@ -33,8 +33,8 @@ GUILD_ID = <your Discord server id>
 #app variables
 ADMIN_PREFIX = <prefix for admin messages to simpbot>
 WAITLIST_CHANNEL = <id of the channel used for joining the waitlist>
-ADMIN_ROLE = admin
-ACCESS_SIZE = 0
+ADMIN_ROLE = <Discord role authorised to use admin commands>
+ACCESS_SIZE = <initial size of access list>
 
 #db variables (Sequelize)
 DB_NAME = <db name>

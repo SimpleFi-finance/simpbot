@@ -1,8 +1,6 @@
-const { Users } = require('../db');
+const { Users, Lists } = require('../db');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const generator = require('generate-password');
-
-let accessSize = process.env.ACCESS_SIZE;
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -10,6 +8,9 @@ module.exports = {
 		.setDescription('Adds you to waitlist and tells you your position'),
 
 	async execute(interaction) {
+
+    const waitlist = await Lists.findOne({where: {name: process.env.WAITLIST_NAME}});
+    const accessSize = waitlist.dataValues.size;
 
     //Set correct channel id for users to create interaction
     if (interaction.channelId !== process.env.WAITLIST_CHANNEL) {

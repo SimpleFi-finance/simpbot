@@ -4,7 +4,7 @@ const adminCheck = require('../helpers/adminCommandCheck');
 let accessSize = process.env.ACCESS_SIZE;
 
 module.exports = {
-  name: 'get-list',
+  name: 'get-waitlist',
 	description: 'Get waitlist info',
 
 	async execute(message) {
@@ -16,7 +16,7 @@ module.exports = {
 
     try {
       const listSize = await Users.findAll();
-      message.author.send('There are ' + listSize.length + ' people in the list \n and ' + accessSize + ' list members have beta access');
+      message.author.send('There are ' + listSize.length + ' people in the list \n and the access size is ' + accessSize);
       return;
     }
     catch(err) {

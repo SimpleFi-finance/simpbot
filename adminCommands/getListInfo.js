@@ -7,7 +7,9 @@ module.exports = {
 	description: 'Get waitlist info',
 
 	async execute(message) {
-    if (!adminCheck(message)) {
+    // console.log(' ---> message from getlist', message.guild.roles);
+    const userIsAdmin = await adminCheck(message);
+    if (!userIsAdmin) {
       message.author.send('Tut tut')
       return;
     }

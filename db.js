@@ -1,4 +1,4 @@
-const Sequelize = require('sequelize');
+const {Sequelize, Op} = require('sequelize');
 
 const sequelize = new Sequelize('database', 'user', 'password', {
 	host: 'localhost',
@@ -11,7 +11,14 @@ const Tags = sequelize.define('tags', {
 		type: Sequelize.STRING,
 		unique: true,
 	},
+  userId: {
+    type: Sequelize.STRING,
+    unique: true,
+  },
 	passcode: Sequelize.STRING,
 });
 
-module.exports = Tags;
+module.exports = {
+  Tags,
+  Op
+}

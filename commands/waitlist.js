@@ -1,5 +1,5 @@
 const fs = require('fs');
-const Tags = require('../db');
+const { Tags } = require('../db');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const generator = require('generate-password');
 const { accessSize, waitListChannel } = require('../config.json');
@@ -17,7 +17,7 @@ module.exports = {
       return;
     }
 
-    const {username, discriminator} = interaction.user;
+    const {username, discriminator, id} = interaction.user;
     // equivalent to: SELECT * FROM tags WHERE name = 'tagName' LIMIT 1;
 
     try {
@@ -43,6 +43,7 @@ module.exports = {
         // register user on DB - equivalent to: INSERT INTO tags (name, description, username) values (?, ?, ?);
         const tag = await Tags.create({
           handle: `${username}${discriminator}`,
+          userId: id,
           passcode: passcode
         });
 

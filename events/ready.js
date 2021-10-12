@@ -1,4 +1,4 @@
-const Tags = require('../db');
+const { Tags } = require('../db');
 
 module.exports = {
 	name: 'ready',

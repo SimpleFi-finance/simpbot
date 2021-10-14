@@ -47,8 +47,10 @@ module.exports = {
           userId: id,
           passCode: passCode
         });
+        
+        const users = await Users.findAll();
 
-        const userPosition = newUser.dataValues.id;
+        const userPosition = users.length;
 
         if (userPosition <= accessSize) {
           const betaRole = await interaction.guild.roles.cache.find(r => r.name === 'beta tester');

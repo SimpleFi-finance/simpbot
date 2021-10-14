@@ -5,8 +5,8 @@ module.exports = {
 	once: true,
 	async execute(client) {
     // use { force: true } as a sync option to drop and recreate table on start - useful for testing
-    await Users.sync({force:true});
-    await Lists.sync({force:true});
+    await Users.sync();
+    await Lists.sync();
 		console.log(`Ready! Logged in as ${client.user.tag}`);
     const waitlist = await Lists.findOne({ where: { name: process.env.WAITLIST_NAME } });
     if (!waitlist) {

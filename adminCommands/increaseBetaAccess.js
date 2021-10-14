@@ -7,7 +7,6 @@ module.exports = {
 	description: 'Increase beta access list size',
 
   async execute(message, newAccessSize) {
-    console.log(message)
     if (!adminCheck(message) || !newAccessSize) {
       message.author.send('Naughty, naughty!')
       return;
@@ -35,10 +34,8 @@ module.exports = {
         ]
       });
       const newBetaUsers = allUsers.slice(currAccessSize, newAccessSize);
-      console.log(newBetaUsers)
       // Send direct messages to each new user accessing the beta
       for (let newBetaUser of newBetaUsers) {
-        console.log('newBetauser',newBetaUser)
         const guild = client.guilds.cache.get(process.env.GUILD_ID);
         const member = await guild.members.fetch(newBetaUser.userId);
 

@@ -35,9 +35,9 @@ module.exports = {
         ]
       });
       allUsers.length = newAccessSize;
-      allUsers.splice(0, currAccessSize - 1);
+      const newBetaUsers = allUsers.splice(0, currAccessSize - 1).map(el => !!el);
       // Send direct messages to each new user accessing the beta
-      for (let newBetaUser of allUsers) {
+      for (let newBetaUser of newBetaUsers) {
         console.log('newBetauser',newBetaUser)
         const guild = client.guilds.cache.get(process.env.GUILD_ID);
         const member = await guild.members.fetch(newBetaUser.userId);

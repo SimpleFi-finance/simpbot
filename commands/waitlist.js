@@ -32,7 +32,7 @@ module.exports = {
           await interaction.user.send(`You already have access and your code is ${user.dataValues.passcode}`)
           await interaction.reply(`${interaction.user} you already have access silly! Check your DMs.`);
         } else {
-          await interaction.user.send(`You're on the waiting list and your position is ${userPosition - accessSize}`)
+          await interaction.user.send(`You're on the waiting list and your position is No.${userPosition - accessSize}`)
           await interaction.reply(`${interaction.user} you're already on the waiting list - check your DMs for wen access!`);
         }
 
@@ -60,7 +60,7 @@ module.exports = {
             "\nYou now have access to the beta-testers channel. Please give us your feedback!");
           await interaction.reply(`Hi ${interaction.user}, you're one of the lucky ones! Check your DMs 👀`)
         } else {
-          await interaction.user.send(`You're on the waiting list and your position is ${userPosition - accessSize}`);
+          await interaction.user.send(`You're on the waiting list! Your current position is No.${userPosition - accessSize}`);
           await interaction.reply(`Hi ${interaction.user}, you'll have access soon! Please check your DMs.`)
         }
       }

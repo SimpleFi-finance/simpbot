@@ -33,7 +33,7 @@ module.exports = {
       // Send direct messages to each new user accessing the beta
       for (let newBetaUser of newBetaUsers) {
         const guild = client.guilds.cache.get(process.env.GUILD_ID);
-        const member = guild.members.cache.get(newBetaUser.userId)
+        const member = await guild.members.fetch(newBetaUser.userId);
         const betaRole = guild.roles.cache.find(r => r.name === 'beta tester');
         await member.roles.add(betaRole);
         await member.send(`Good news ${member}, you now have access to the beta! You access code is ${newBetaUser.passcode}`)

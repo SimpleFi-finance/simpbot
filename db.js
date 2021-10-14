@@ -5,8 +5,7 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
   dialect: process.env.DB_DIALECT,
   ssl: true,
   dialectOptions: {
-    require: true,
-    rejectUnauthorized: false
+    ssl: true
   }
 });
 

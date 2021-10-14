@@ -1,12 +1,13 @@
 const client = require('../client');
-const { Users, Lists, Op } = require('../db');
+const { Users, Lists } = require('../db');
 const adminCheck = require('../helpers/adminCommandCheck');
 
 module.exports = {
   name: 'increase-beta',
 	description: 'Increase beta access list size',
 
-	async execute(message, newAccessSize) {
+  async execute(message, newAccessSize) {
+    console.log(message)
     if (!adminCheck(message) || !newAccessSize) {
       message.author.send('Naughty, naughty!')
       return;
@@ -27,7 +28,7 @@ module.exports = {
           ['userId', 'ASC']
         ]
       });
-      const allBetaUsers = allUsers.length(newAccessSize);
+      const allBetaUsers = allUsers.length = newAccessSize;
 
       const newBetaUsers = allBetaUsers.splice(0, currAccessSize - 1);
       // Send direct messages to each new user accessing the beta

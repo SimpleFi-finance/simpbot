@@ -24,7 +24,8 @@ for (const file of eventFiles) {
 	}
 }
 
-client.on('messageCreate', async message =>{
+client.on('messageCreate', async message => {
+	console.log(message)
   if(!message.content.startsWith(process.env.ADMIN_PREFIX) || message.author.bot) return;
 
     const args = message.content.slice(process.env.ADMIN_PREFIX.length + 1).split(' ');

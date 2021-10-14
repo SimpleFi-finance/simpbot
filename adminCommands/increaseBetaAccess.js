@@ -35,7 +35,7 @@ module.exports = {
         ]
       });
       allUsers.length = newAccessSize;
-      const newBetaUsers = allUsers.splice(0, currAccessSize - 1).map(el => !!el);
+      const newBetaUsers = allUsers.splice(0, currAccessSize - 1).filter(el => !!el);
       // Send direct messages to each new user accessing the beta
       for (let newBetaUser of newBetaUsers) {
         console.log('newBetauser',newBetaUser)

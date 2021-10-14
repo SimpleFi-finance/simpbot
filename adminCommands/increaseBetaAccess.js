@@ -36,7 +36,7 @@ module.exports = {
         const member = await guild.members.fetch(newBetaUser.userId);
         const betaRole = guild.roles.cache.find(r => r.name === 'beta tester');
         await member.roles.add(betaRole);
-        await member.send(`Good news ${member}, you now have access to the beta! You access code is ${newBetaUser.passcode}`)
+        await member.send(`Good news ${member}, you now have access to the beta! You access code is ${newBetaUser.passCode}`)
       }
 
       // Update the list with new max size

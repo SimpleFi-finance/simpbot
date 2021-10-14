@@ -29,7 +29,7 @@ module.exports = {
         const userPosition = user.dataValues.id;
 
         if (userPosition <= accessSize) {
-          await interaction.user.send(`You already have access and your code is ${user.dataValues.passcode}`)
+          await interaction.user.send(`You already have access and your code is ${user.dataValues.passCode}`)
           await interaction.reply(`${interaction.user} you already have access silly! Check your DMs.`);
         } else {
           await interaction.user.send(`You're on the waiting list and your position is No.${userPosition - accessSize}`)
@@ -37,7 +37,7 @@ module.exports = {
         }
 
       } else {
-        const passcode = generator.generate({
+        const passCode = generator.generate({
           length: 6,
           numbers: true
         });
@@ -45,7 +45,7 @@ module.exports = {
         const newUser = await Users.create({
           handle: `${username}${discriminator}`,
           userId: id,
-          passcode: passcode
+          passCode: passCode
         });
 
         const userPosition = newUser.dataValues.id;
@@ -56,7 +56,7 @@ module.exports = {
           //give the new user access to beta-testers channel
           await interaction.member.roles.add(betaRole);
           await interaction.newUser.send(
-            "You've been authorised. Your access code is " + passcode +
+            "You've been authorised. Your access code is " + passCode +
             "\nYou now have access to the beta-testers channel. Please give us your feedback!");
           await interaction.reply(`Hi ${interaction.user}, you're one of the lucky ones! Check your DMs 👀`)
         } else {

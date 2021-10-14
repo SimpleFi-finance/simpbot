@@ -4,7 +4,7 @@ module.exports = {
 	name: 'ready',
 	once: true,
 	async execute(client) {
-    // use { force: true } as a sync option to drop and recreate table on start
+    // use { force: true } as a sync option to drop and recreate table on start - useful for testing
     await Users.sync();
     await Lists.sync();
 		console.log(`Ready! Logged in as ${client.user.tag}`);

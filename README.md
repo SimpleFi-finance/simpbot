@@ -22,6 +22,13 @@ Admin controls (prepend admin prefix):
 - get-waitlist: get info on the current state of the waiting list
 - increase-beta {number}: increases the size of the beta access list and notifies users of their access codes
 
+## Register slash commands
+Make sure to have your bot properly configured. See [documentation](https://discord.com/developers/docs/intro).
+Then run: 
+```
+node deploy-commands.js
+```
+
 ## Environment
 Create a .env file with the following information:
 ```

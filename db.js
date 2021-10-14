@@ -2,8 +2,7 @@ const {Sequelize, Op} = require('sequelize');
 
 const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.PASSWORD, {
 	host: process.env.DB_HOST,
-	dialect: process.env.DB_DIALECT,
-	storage: process.env.DB_STORAGE
+	dialect: process.env.DB_DIALECT
 });
 
 const Users = sequelize.define('users', {
@@ -15,7 +14,13 @@ const Users = sequelize.define('users', {
     type: Sequelize.STRING,
     unique: true,
   },
-	passcode: Sequelize.STRING,
+  passCode: {
+    type: Sequelize.STRING,
+    unique: true,
+  },
+  useCounter: Sequelize.INTEGER,
+  lastAccess: Sequelize.DATE,
+  jwt: Sequelize.STRING
 });
 
 const Lists = sequelize.define('lists', {

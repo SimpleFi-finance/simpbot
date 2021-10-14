@@ -24,10 +24,12 @@ module.exports = {
 
       const allUsers = await Users.findAll({
         order: [
-          ['ID', 'ASC']
+          ['userId', 'ASC']
         ]
       });
-      const newBetaUsers = allUsers.length(newAccessSize);
+      const allBetaUsers = allUsers.length(newAccessSize);
+
+      const newBetaUsers = allBetaUsers.splice(0, currAccessSize - 1);
       // Send direct messages to each new user accessing the beta
       for (let newBetaUser of newBetaUsers) {
         const guild = client.guilds.cache.get(process.env.GUILD_ID);

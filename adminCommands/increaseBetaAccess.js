@@ -29,7 +29,7 @@ module.exports = {
         ]
       });
       allUsers.length = newAccessSize;
-
+      console.log(currAccessSize)
       const newBetaUsers = allUsers.splice(0, currAccessSize - 1);
       console.log(newBetaUsers, allUsers)
       // Send direct messages to each new user accessing the beta

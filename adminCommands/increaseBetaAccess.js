@@ -31,8 +31,10 @@ module.exports = {
       allUsers.length = newAccessSize;
 
       const newBetaUsers = allUsers.splice(0, currAccessSize - 1);
+      console.log(newBetaUsers)
       // Send direct messages to each new user accessing the beta
       for (let newBetaUser of newBetaUsers) {
+        console.log(newBetaUser)
         const guild = client.guilds.cache.get(process.env.GUILD_ID);
         const member = await guild.members.fetch(newBetaUser.userId);
         const betaRole = guild.roles.cache.find(r => r.name === 'beta tester');

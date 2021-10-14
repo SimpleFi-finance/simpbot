@@ -28,9 +28,9 @@ module.exports = {
           ['userId', 'ASC']
         ]
       });
-      const allBetaUsers = allUsers.length = newAccessSize;
+      allUsers.length = newAccessSize;
 
-      const newBetaUsers = allBetaUsers.splice(0, currAccessSize - 1);
+      const newBetaUsers = allUsers.splice(0, currAccessSize - 1);
       // Send direct messages to each new user accessing the beta
       for (let newBetaUser of newBetaUsers) {
         const guild = client.guilds.cache.get(process.env.GUILD_ID);

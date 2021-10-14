@@ -25,7 +25,6 @@ for (const file of eventFiles) {
 }
 
 client.on('messageCreate', async message => {
-	console.log(message)
   if(!message.content.startsWith(process.env.ADMIN_PREFIX) || message.author.bot) return;
 
     const args = message.content.slice(process.env.ADMIN_PREFIX.length + 1).split(' ');
@@ -44,7 +43,7 @@ client.on('messageCreate', async message => {
 
 
 client.on('interactionCreate', async interaction => {
-  
+  console.log(interaction)
 	if (!interaction.isCommand()) return;
 
   const command = client.commands.get(interaction.commandName);

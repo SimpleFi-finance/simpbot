@@ -47,7 +47,7 @@ module.exports = {
           userId: id,
           passCode: passCode
         });
-        
+
         const users = await Users.findAll();
 
         const userPosition = users.length;
@@ -57,7 +57,7 @@ module.exports = {
           
           //give the new user access to beta-testers channel
           await interaction.member.roles.add(betaRole);
-          await interaction.newUser.send(
+          await interaction.user.send(
             "You've been authorised. Your access code is " + passCode +
             "\nYou now have access to the beta-testers channel. Please give us your feedback!");
           await interaction.reply(`Hi ${interaction.user}, you're one of the lucky ones! Check your DMs 👀`)

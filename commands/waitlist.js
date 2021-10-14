@@ -26,9 +26,15 @@ module.exports = {
 
       // Deal with user who already registered
       if (user) {
-        const userPosition = user.dataValues.id;
+        const users = await Users.findAll({
+          order: [
+            ['id', 'ASC']
+          ]
+        });
 
-        if (userPosition <= accessSize) {
+        const userPosition = users.findIndex(el => el.passCode === user.passCode);
+
+        if (userPosition + 1 <= accessSize) {
           await interaction.user.send(`You already have access and your code is ${user.dataValues.passCode}`)
           await interaction.reply(`${interaction.user} you already have access silly! Check your DMs.`);
         } else {
@@ -38,7 +44,7 @@ module.exports = {
 
       } else {
         const passCode = generator.generate({
-          length: 6,
+          length: 9,
           numbers: true
         });
         // register user on DB - equivalent to: INSERT INTO users (handle, userId, passcode) values (?, ?, ?);
@@ -48,11 +54,15 @@ module.exports = {
           passCode: passCode
         });
 
-        const users = await Users.findAll();
+        const users = await Users.findAll({
+          order: [
+            ['id', 'ASC']
+          ]
+        });
 
-        const userPosition = users.length;
+        const userPosition = users.findIndex(el => el.passCode === passCode);
 
-        if (userPosition <= accessSize) {
+        if (userPosition + 1 <= accessSize) {
           const betaRole = await interaction.guild.roles.cache.find(r => r.name === 'beta tester');
           
           //give the new user access to beta-testers channel

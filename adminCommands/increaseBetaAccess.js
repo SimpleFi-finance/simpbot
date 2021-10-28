@@ -41,7 +41,7 @@ module.exports = {
 
         const betaRole = guild.roles.cache.find(r => r.name === 'beta tester');
         await member.roles.add(betaRole);
-        await member.send(`Good news ${member}, you now have access to the beta! Launch the app on https://simplefi.finance. You access code is ${newBetaUser.passCode}`)
+        await member.send(`Good news ${member}, you now have access to the beta! You also have access to the private #beta-testers channel - please leave your feedback there! Launch the app on https://simplefi.finance. You access code is ${newBetaUser.passCode}`)
       }
 
     } catch(err) {

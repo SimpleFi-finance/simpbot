@@ -34,13 +34,17 @@ module.exports = {
         ]
       });
       const newBetaUsers = allUsers.slice(currAccessSize, newAccessSize);
+      console.log(newBetaUsers);
       // Send direct messages to each new user accessing the beta
       for (let newBetaUser of newBetaUsers) {
         const guild = client.guilds.cache.get(process.env.GUILD_ID);
         const member = await guild.members.fetch(newBetaUser.userId);
 
         const betaRole = guild.roles.cache.find(r => r.name === 'beta tester');
+        console.log(betaRole);
         await member.roles.add(betaRole);
+        console.log('after beta role')
+        console.log(newBetaUser.passCode);
         await member.send(`Good news ${member}, you now have access to the beta! You also have access to the private #beta-testers channel - please leave your feedback there! Launch the app on https://simplefi.finance. You access code is ${newBetaUser.passCode}`)
       }
 

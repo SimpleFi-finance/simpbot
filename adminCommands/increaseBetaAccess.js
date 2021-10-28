@@ -33,6 +33,7 @@ module.exports = {
           ['userId', 'ASC']
         ]
       });
+      console.log(allUsers);
       const newBetaUsers = allUsers.slice(currAccessSize, newAccessSize);
       console.log(newBetaUsers);
       // Send direct messages to each new user accessing the beta

@@ -9,7 +9,8 @@ module.exports = {
 
 	async execute(interaction) {
 
-    const waitlist = await Lists.findOne({where: {name: process.env.WAITLIST_NAME}});
+    const waitlist = await Lists.findOne({ where: { name: process.env.WAITLIST_NAME } });
+    console.log(waitlist);
     const accessSize = waitlist.dataValues.size;
 
     //Set correct channel id for users to create interaction
@@ -63,10 +64,9 @@ module.exports = {
         const userPosition = users.findIndex(el => el.passCode === passCode);
 
         if (userPosition + 1 <= accessSize) {
-          const betaRole = await interaction.guild.roles.cache.find(r => r.name === 'beta tester');
-          
+          const betaRole = interaction.guild.roles.cache.find(r => r.name === 'beta tester');
           //give the new user access to beta-testers channel
-          await interaction.member.roles.add(betaRole);
+          await interaction.member.roles.add(betaRole.id);
           await interaction.user.send(
             "You've been authorised. Your access code is " + passCode +
             "\nYou now have access to the beta-testers channel. Please give us your feedback!");

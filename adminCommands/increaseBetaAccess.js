@@ -2,6 +2,18 @@ const client = require('../client');
 const { Users, Lists } = require('../db');
 const adminCheck = require('../helpers/adminCommandCheck');
 
+const messageUser = async ({ user, guild }) => {
+  try {
+    const member = await guild.members.fetch(user.userId);
+
+    const betaRole = guild.roles.cache.find(r => r.name === 'beta tester');
+    await member.send(`Good news ${member}, you now have access to the beta! You also have access to the private #beta-testers channel - please leave your feedback there! Launch the app on https://simplefi.finance. You access code is ${user.passCode}`)
+    await member.roles.add(betaRole);
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   name: 'increase-beta',
 	description: 'Increase beta access list size',
@@ -36,15 +48,17 @@ module.exports = {
 
       const newBetaUsers = allUsers.slice(currAccessSize, newAccessSize);
       // Send direct messages to each new user accessing the beta
+      const messagePromises = [];
       for (let newBetaUser of newBetaUsers) {
-        const guild = client.guilds.cache.get(process.env.GUILD_ID);
-        const member = await guild.members.fetch(newBetaUser.userId);
-
-        const betaRole = guild.roles.cache.find(r => r.name === 'beta tester');
-        await member.roles.add(betaRole);
-        await member.send(`Good news ${member}, you now have access to the beta! You also have access to the private #beta-testers channel - please leave your feedback there! Launch the app on https://simplefi.finance. You access code is ${newBetaUser.passCode}`)
+        messagePromises.push(messageUser({
+          user: newBetaUser,
+          guild: client.guilds.cache.get(process.env.GUILD_ID)
+        }));
       }
-
+      const promises = await Promise.allSettled(messagePromises);
+      // to check who has been rejected and why
+      const rejected = promises.filter(el => el.status === 'rejected');
+      console.log(rejected)
     } catch(err) {
       console.error(err);
     }

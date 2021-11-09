@@ -59,7 +59,7 @@ module.exports = {
       });
     } catch (error) {
       console.error('waitlist db error --->', error)
-      // TODO: add error message to log channel and user
+      await interaction.reply("Something went wrong 😞 Please try again or contact a team member.");
     }
 
     // Get target user's position in Index
@@ -75,7 +75,7 @@ module.exports = {
         channelMessage = `${interaction.user} you already have access silly! `;
         dmStatusMessage = 'Check your DMs for instructions 👀'
         dmToUser = `You already have access and your code is ${user.dataValues.passCode}. Launch the app on https://simplefi.finance. `;
-        roleStatusMessage = "\nRemember you can now leave feedback on the private #beta-testers channel. It may earn you some rewards 😉"
+        roleStatusMessage = "\nRemember you can now leave feedback on the private #beta-testers channel. It may earn you some rewards 😉🐳"
       } else {
         channelMessage = `${interaction.user} you're already on the waiting list. `;
         dmStatusMessage = 'Check your DMs for wen access! 👀'
@@ -85,8 +85,8 @@ module.exports = {
       if (userHasAccess) {
         channelMessage = `Hi ${interaction.user}, you're one of the lucky ones! `;
         dmStatusMessage = 'Check your DMs for instructions 👀'
-        dmToUser =  "You've been authorised. Your access code is " + newUser.dataValues.passCode + ". Launch the app on https://simplefi.finance"
-        roleStatusMessage = "\nYou also have access to the beta-testers channel now. Please give us your feedback there - it may earn you some rewards 😉";
+        dmToUser =  "You now have access to the SimpleFi app 🥳 Launch it on https://simplefi.finance using this passcode: " +newUser.dataValues.passCode
+        roleStatusMessage = "\nYou also have access to the beta-testers channel now. Please give us your feedback there - it may earn you some rewards 😉🐳";
       } else {
         channelMessage = `Hi ${interaction.user}, you're on the waiting list and will have access soon! `;
         dmStatusMessage = 'Check your DMs for wen access! 👀'
@@ -102,8 +102,7 @@ module.exports = {
           await interaction.member.roles.add(betaRole);
         } catch (error) {
           console.error('Add role error --->', error);
-          roleStatusMessage = "\nWe had trouble giving you access to the private #beta-testers channel. You could get rewards for leaving feedback there, so please contact a team member."
-          // TODO: add error message to log channel and user and channel
+          roleStatusMessage = "\nBut we had trouble giving you access to the private #beta-testers channel 😢 You could get rewards for leaving feedback there, so please contact a team member."
         }
       }
     }
@@ -119,7 +118,6 @@ module.exports = {
         channelMessage = 'Oops something went wrong. Please DM a team member.';
         dmStatusMessage = '';
       }
-      // TODO: add error message to log channel and user and channel
     } finally {
       await interaction.reply(channelMessage + dmStatusMessage);
     }

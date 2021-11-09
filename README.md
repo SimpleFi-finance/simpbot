@@ -22,12 +22,19 @@ Admin controls (prepend admin prefix):
 - get-waitlist: get info on the current state of the waiting list
 - increase-beta {number}: increases the size of the beta access list and notifies users of their access codes
 
-## Register slash commands
-Make sure to have your bot properly configured. See [documentation](https://discord.com/developers/docs/intro).
+## Configure your bot
+Create your bot on the [Discord developer portal](https://discord.com/developers/applications) and make sure it's properly configured. See [documentation](https://discord.com/developers/docs/intro).
+In the OAuth2 URL Generator, tick
+- the following scopes: bot and applications.commands
+- the following permissions: Manage Server, Manage Roles, Manage Channels, View Channels, Send Messages, Manage Messages, Read Message History
+
 Then run: 
 ```
 node deploy-commands.js
 ```
+
+## Configure your server
+In your Discord server settings, after adding your bot, ensure that the simplefi role is placed above all other roles.
 
 ## Environment
 Create a .env file with the following information:

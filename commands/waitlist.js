@@ -120,7 +120,7 @@ module.exports = {
       console.error('DM error --->', error);
       const errorUser = user || newUser;
       const accessStatus = userHasAccess ? `user has access - passcode: ${errorUser.dataValues.passCode}` : `user is on waitlist - position: ${userPosition + 1 - accessSize}`;
-      errLogChannel.send("command: waitlist \ninternal code: DM issue \nuser: " + username + discriminator + "\nerror name: " + error.name + "\nerror message: " + error.message + "\naccess status: " + accessStatus + "\n---");
+      errLogChannel.send(`command: waitlist \ninternal code: DM issue \nuser: <@${id}>\nerror name: ${error.name}\nerror message: ${error.message}\naccess status: ${accessStatus}\n---`);
       
       if (error.message === 'Cannot send messages to this user') {
         dmStatusMessage = "But I can't send you the details  😢 \nPlease allow DMs from this server or contact a team member.";

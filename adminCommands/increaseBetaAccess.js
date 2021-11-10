@@ -2,24 +2,14 @@ const client = require('../client');
 const { Users, Lists } = require('../db');
 const adminCheck = require('../helpers/adminCommandCheck');
 
-// Add role
-const messageUser = async (member) => {
-  // try {
-    await member.send(`Good news ${member}, you now have access to the beta! You also have access to the private #beta-testers channel - please leave your feedback there! Launch the app on https://simplefi.finance. You access code is ${member.passCode}`)
-  // } catch (error) {
-  //   throw error;
-  // }
-};
-
-const addRoleToUser = async (member, role) => {
-  try {
-    await member.roles.add(role);
-  } catch (error) {
-    throw error;
-  }
-};
-
-
+// Filters rejected promises and appends user data
+function filterRejectedPromises (promises, users) {
+  const rejectedPromises = promises.filter((el, i) => {
+    if (el.status === 'rejected') el.user = users[i];
+    return el.status === 'rejected'
+  });
+  return rejectedPromises;
+}
 
 module.exports = {
   name: 'increase-beta',
@@ -78,23 +68,35 @@ module.exports = {
 
       // Set up add roles and send DMs
       const rolePromises = [];
-      const roleErrors = [];
       const messagePromises = [];
-      const messageErrors = [];
-      try {
-        for (let newBetaUser of newBetaUsers) {
-          const member = await guild.members.fetch(newBetaUser.userId);
-          rolePromises.push(addRoleToUser(member, betaRole));
-          messagePromises.push(messageUser(member));
-        }
-      } catch (error) {
+      for (let newBetaUser of newBetaUsers) {
+        let member;
+        try {
+          member = await guild.members.fetch(newBetaUser.userId);
+        } catch (error) {
+          //TODO: channel and author
           console.error(' ---> error fetching user Id', error);
+        }
+        rolePromises.push(member.roles.add(betaRole));
+        messagePromises.push(member.send(`Good news ${member}, you now have access to the beta! You also have access to the private #beta-testers channel - please leave your feedback there! Launch the app on https://simplefi.finance. You access code is ${newBetaUser.passCode}`));          
       }
 
-      const promises = await Promise.allSettled(messagePromises);
-      // to check who has been rejected and why
-      const rejected = promises.filter(el => el.status === 'rejected');
-      console.log('rejected[0].reason', rejected[0].reason);
-      console.log('rejected[0].reason', rejected[0].reason.name);
+      const settledMessagePromises = await Promise.allSettled(messagePromises);
+      const settledRolePromises = await Promise.allSettled(rolePromises);
+      // unhelpfully, Discordjs errors do not contain the target user
+      const rejectedMessagePromises = filterRejectedPromises (settledMessagePromises, newBetaUsers);
+      console.log(' ---> rejectedMessagePromises', rejectedMessagePromises);
+      const rejectedRolePromises = filterRejectedPromises (settledMessagePromises, newBetaUsers);
+
+      if (rejectedMessagePromises.length) {
+        let rejectedUsersMessage = 'Hey ';
+        for (let rejectedPromise of rejectedMessagePromises) {
+          //TODO: log channel error message
+          console.log(' ---> Increase beta DM error', rejectedPromise);  
+          rejectedUsersMessage += `<@${rejectedPromise.user.userId}>, `
+        }
+        rejectedUsersMessage = rejectedUsersMessage.substring(0, -2) + " you now have access to the beta but I couldn't DM you your access code  🥺  \nPlease either allow DMs from this server and type /waitlist here again, or get in touch with the team!";
+        waitlistChannel.send(rejectedUsers);
+      }
 	},
 };

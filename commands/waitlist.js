@@ -1,3 +1,4 @@
+const client = require('../client');
 const { Users, Lists } = require('../db');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const generator = require('generate-password');
@@ -27,9 +28,8 @@ module.exports = {
         userHasRole;
     let userHasAccess = false;
     const {username, discriminator, id} = interaction.user;
-    // TODO: add this to .env
-    //TODO: rename to accessRole?
-    const betaRole = interaction.guild.roles.cache.find(r => r.name === 'beta tester');
+    const errLogChannel = client.channels.cache.get(process.env.ERROR_LOGS_CHANNEL);
+    const accessRole = interaction.guild.roles.cache.find(r => r.name === process.env.WAITLIST_ROLE);
 
     // All DB interactions
     try {
@@ -58,8 +58,10 @@ module.exports = {
         ]
       });
     } catch (error) {
-      console.error('waitlist db error --->', error)
-      await interaction.reply("Something went wrong 😞 Please try again or contact a team member.");
+      console.error('waitlist db error --->', error);
+      errLogChannel.send("command: waitlist \ninternal code: DB issue \nuser: " + username + discriminator + "\nerror name: " + error.name + "\nerror message: " + error.message + "\n---");
+      await interaction.reply("Something went wrong  😞  Please try again or contact a team member.");
+      return
     }
 
     // Get target user's position in Index
@@ -73,51 +75,60 @@ module.exports = {
     if (user) {
       if (userHasAccess) {
         channelMessage = `${interaction.user} you already have access silly! `;
-        dmStatusMessage = 'Check your DMs for instructions 👀'
+        dmStatusMessage = 'Check your DMs for instructions  👀';
         dmToUser = `You already have access and your code is ${user.dataValues.passCode}. Launch the app on https://simplefi.finance. `;
-        roleStatusMessage = "\nRemember you can now leave feedback on the private #beta-testers channel. It may earn you some rewards 😉🐳"
+        roleStatusMessage = "\nRemember you can now leave feedback on the private #beta-testers channel. It may earn you some rewards  😉 🐳";
       } else {
         channelMessage = `${interaction.user} you're already on the waiting list. `;
-        dmStatusMessage = 'Check your DMs for wen access! 👀'
+        dmStatusMessage = 'Check your DMs for wen access!  👀';
         dmToUser = `You're on the waiting list and your position is No.${userPosition + 1 - accessSize}`;
+        roleStatusMessage = '';
       }
     } else {
       if (userHasAccess) {
         channelMessage = `Hi ${interaction.user}, you're one of the lucky ones! `;
-        dmStatusMessage = 'Check your DMs for instructions 👀'
-        dmToUser =  "You now have access to the SimpleFi app 🥳 Launch it on https://simplefi.finance using this passcode: " +newUser.dataValues.passCode
-        roleStatusMessage = "\nYou also have access to the beta-testers channel now. Please give us your feedback there - it may earn you some rewards 😉🐳";
+        dmStatusMessage = 'Check your DMs for instructions  👀';
+        dmToUser =  "You now have access to the SimpleFi app  🥳  Launch it on https://simplefi.finance using this passcode: " + newUser.dataValues.passCode;
+        roleStatusMessage = "\nYou also have access to the beta-testers channel now. Please give us your feedback there - it may earn you some rewards  😉 🐳";
       } else {
         channelMessage = `Hi ${interaction.user}, you're on the waiting list and will have access soon! `;
-        dmStatusMessage = 'Check your DMs for wen access! 👀'
-        dmToUser =  `You're on the waiting list! Your current position is No.${userPosition + 1 - accessSize}`
+        dmStatusMessage = 'Check your DMs for wen access!  👀';
+        dmToUser =  `You're on the waiting list! Your current position is No.${userPosition + 1 - accessSize}`;
+        roleStatusMessage = '';
       }
     }
 
     // Attempt add role
     if (userHasAccess) {
-      userHasRole = interaction.member.roles.cache.some(role => role.name === betaRole.name);
+      userHasRole = interaction.member.roles.cache.some(role => role.name === accessRole.name);
       if (!userHasRole) {
         try {
-          await interaction.member.roles.add(betaRole);
+          await interaction.member.roles.add(accessRole);
         } catch (error) {
           console.error('Add role error --->', error);
-          roleStatusMessage = "\nBut we had trouble giving you access to the private #beta-testers channel 😢 You could get rewards for leaving feedback there, so please contact a team member."
+          errLogChannel.send("command: waitlist \ninternal code: assign role issue \nuser: " + username + discriminator + "\nerror name: " + error.name + "\nerror message: " + error.message + "\n---");
+          roleStatusMessage = "\nBut we had trouble giving you access to the private #beta-testers channel  😢  You could get rewards for leaving feedback there, so please contact a team member."
         }
       }
     }
 
     // Attempt DMs
     try {
-      await interaction.user.send(dmToUser + roleStatusMessage)
+      await interaction.user.send(dmToUser + roleStatusMessage);
+
     } catch (error) {
-      console.error('DM error --->', error)
+      console.error('DM error --->', error);
+      const errorUser = user || newUser;
+      const accessStatus = userHasAccess ? `user has access - passcode: ${errorUser.dataValues.passCode}` : `user is on waitlist - position: ${userPosition + 1 - accessSize}`;
+      errLogChannel.send("command: waitlist \ninternal code: DM issue \nuser: " + username + discriminator + "\nerror name: " + error.name + "\nerror message: " + error.message + "\naccess status: " + accessStatus + "\n---");
+      
       if (error.message === 'Cannot send messages to this user') {
-        dmStatusMessage = "But I can't send you the details 😢 \nPlease allow DMs from this server or contact a team member.";
+        dmStatusMessage = "But I can't send you the details  😢 \nPlease allow DMs from this server or contact a team member.";
       } else {
         channelMessage = 'Oops something went wrong. Please DM a team member.';
         dmStatusMessage = '';
       }
+
     } finally {
       await interaction.reply(channelMessage + dmStatusMessage);
     }

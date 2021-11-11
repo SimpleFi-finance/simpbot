@@ -1,85 +1,137 @@
-const { Users, Lists } = require('../db');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const generator = require('generate-password');
+const client = require('../client');
+const { Users, Lists } = require('../db');
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('waitlist')
-		.setDescription('Adds you to waitlist and tells you your position'),
+  data: new SlashCommandBuilder()
+    .setName('waitlist')
+    .setDescription('Adds you to waitlist and tells you your position'),
 
-	async execute(interaction) {
-
-    const waitlist = await Lists.findOne({ where: { name: process.env.WAITLIST_NAME } });
-    console.log(waitlist);
-    const accessSize = waitlist.dataValues.size;
-
-    //Set correct channel id for users to create interaction
+  async execute(interaction) {
+    // Check if command sent in correct channel
     if (interaction.channelId !== process.env.WAITLIST_CHANNEL) {
-      await interaction.reply(`Only use this command in the waitlist channel`);
+      const waitlistChannel = client.channels.cache.get(process.env.WAITLIST_CHANNEL);
+      await interaction.reply(`Only use this command in ${waitlistChannel}`);
       return;
     }
 
-    const {username, discriminator, id} = interaction.user;
-    // equivalent to: SELECT * FROM users WHERE name = 'handle' LIMIT 1;
+    let
+      user,
+      newUser,
+      users,
+      userPosition,
+      accessSize,
+      channelMessage,
+      dmStatusMessage,
+      roleStatusMessage,
+      dmToUser,
+      userHasRole;
+    let userHasAccess = false;
+    const { username, discriminator, id } = interaction.user;
+    const errLogChannel = client.channels.cache.get(process.env.ERROR_LOGS_CHANNEL);
+    const feedbackChannel = client.channels.cache.get(process.env.FEEDBACK_CHANNEL);
+    const accessRole = interaction.guild.roles.cache.find(r => r.name === process.env.FEEDBACK_ROLE);
 
+    // All DB interactions
     try {
-      const user = await Users.findOne({ where: { handle: username + discriminator } });
+      const waitlist = await Lists.findOne({ where: { name: process.env.WAITLIST_NAME } });
+      accessSize = waitlist.dataValues.size;
 
-      // Deal with user who already registered
-      if (user) {
-        const users = await Users.findAll({
-          order: [
-            ['id', 'ASC']
-          ]
-        });
-
-        const userPosition = users.findIndex(el => el.passCode === user.passCode);
-
-        if (userPosition + 1 <= accessSize) {
-          await interaction.user.send(`You already have access and your code is ${user.dataValues.passCode}`)
-          await interaction.reply(`${interaction.user} you already have access silly! Check your DMs.`);
-        } else {
-          await interaction.user.send(`You're on the waiting list and your position is No.${userPosition + 1 - accessSize}`)
-          await interaction.reply(`${interaction.user} you're already on the waiting list - check your DMs for wen access!`);
-        }
-
-      } else {
+      // Check if user already exists or create one if not
+      user = await Users.findOne({ where: { handle: username + discriminator } });
+      if (!user) {
         const passCode = generator.generate({
           length: 9,
           numbers: true
         });
         // register user on DB - equivalent to: INSERT INTO users (handle, userId, passcode) values (?, ?, ?);
-        const newUser = await Users.create({
+        newUser = await Users.create({
           handle: `${username}${discriminator}`,
           userId: id,
-          passCode: passCode
+          passCode
         });
-
-        const users = await Users.findAll({
-          order: [
-            ['id', 'ASC']
-          ]
-        });
-
-        const userPosition = users.findIndex(el => el.passCode === passCode);
-
-        if (userPosition + 1 <= accessSize) {
-          const betaRole = interaction.guild.roles.cache.find(r => r.name === 'beta tester');
-          //give the new user access to beta-testers channel
-          await interaction.member.roles.add(betaRole.id);
-          await interaction.user.send(
-            "You've been authorised. Your access code is " + passCode +
-            "\nYou now have access to the beta-testers channel. Please give us your feedback!");
-          await interaction.reply(`Hi ${interaction.user}, you're one of the lucky ones! Check your DMs 👀`)
-        } else {
-          await interaction.user.send(`You're on the waiting list! Your current position is No.${userPosition + 1 - accessSize}`);
-          await interaction.reply(`Hi ${interaction.user}, you'll have access soon! Please check your DMs.`)
-        }
       }
 
+      // Get list of existing users
+      users = await Users.findAll({
+        order: [
+          ['id', 'ASC']
+        ]
+      });
     } catch (error) {
-      console.error('Waitlist error -->', error);
-      await interaction.reply('Oops something went wrong. Please DM a team member.');
+      console.error('waitlist db error --->', error); // eslint-disable-line no-console
+      errLogChannel.send(`command: waitlist \ninternal code: DB issue \nuser: <@${id}> \nerror name: ${error.name} \nerror message: ${error.message} \n---`);
+      await interaction.reply("Something went wrong  😞  Please try again or contact a team member.");
+      return;
+    }
+
+    // Get target user's position in Index
+    userPosition = users.findIndex(el => { // eslint-disable-line prefer-const
+      const targetUser = user ? user : newUser;
+      return el.userId === targetUser.userId;
+    });
+    if (userPosition + 1 <= accessSize) { userHasAccess = true; }
+
+    // Set channel and DM messages
+    if (user) {
+      if (userHasAccess) {
+        channelMessage = `${interaction.user} you already have access silly! `;
+        dmStatusMessage = 'Check your DMs for instructions  👀';
+        dmToUser = `You already have access and your code is ${user.dataValues.passCode}. Launch the app on https://simplefi.finance. `;
+        roleStatusMessage = `\nRemember you can now leave feedback on the private ${feedbackChannel} channel. It may earn you some rewards  😉 🐳`;
+      } else {
+        channelMessage = `${interaction.user} you're already on the waiting list. `;
+        dmStatusMessage = 'Check your DMs for wen access!  👀';
+        dmToUser = `You're on the waiting list and your position is No.${userPosition + 1 - accessSize}`;
+        roleStatusMessage = '';
+      }
+    } else {
+      // eslint-disable-next-line no-lonely-if
+      if (userHasAccess) {
+        channelMessage = `Hi ${interaction.user}, you're one of the lucky ones! `;
+        dmStatusMessage = 'Check your DMs for instructions  👀';
+        dmToUser = `You now have access to the SimpleFi app  🥳  Launch it on https://simplefi.finance using this passcode: ${newUser.dataValues.passCode}`;
+        roleStatusMessage = `\nYou also have access to the ${feedbackChannel} channel now. Please give us your feedback there - it may earn you some rewards  😉 🐳`;
+      } else {
+        channelMessage = `Hi ${interaction.user}, you're on the waiting list and will have access soon! `;
+        dmStatusMessage = 'Check your DMs for wen access!  👀';
+        dmToUser = `You're on the waiting list! Your current position is No.${userPosition + 1 - accessSize}`;
+        roleStatusMessage = '';
+      }
+    }
+
+    // Attempt add role
+    if (userHasAccess) {
+      userHasRole = interaction.member.roles.cache.some(role => role.name === accessRole.name);
+      if (!userHasRole) {
+        try {
+          await interaction.member.roles.add(accessRole);
+        } catch (error) {
+          console.error('Add role error --->', error); // eslint-disable-line no-console
+          errLogChannel.send(`command: waitlist \ninternal code: assign role issue \nuser: <@${id}> \nerror name: ${error.name} \nerror message: ${error.message} \n---`);
+          roleStatusMessage = "\nBut we had trouble giving you access to the private #beta-testers channel  😢  You could get rewards for leaving feedback there, so please contact a team member.";
+        }
+      }
+    }
+
+    // Attempt DMs
+    try {
+      await interaction.user.send(dmToUser + roleStatusMessage);
+    } catch (error) {
+      console.error('DM error --->', error); // eslint-disable-line no-console
+      const errorUser = user || newUser;
+      const accessStatus = userHasAccess ? `user has access - passcode: ${errorUser.dataValues.passCode}` : `user is on waitlist - position: ${userPosition + 1 - accessSize}`;
+      errLogChannel.send(`command: waitlist \ninternal code: DM issue \nuser: <@${id}>\nerror name: ${error.name}\nerror message: ${error.message}\naccess status: ${accessStatus}\n---`);
+
+      if (error.message === 'Cannot send messages to this user') {
+        dmStatusMessage = "But I can't send you the details  😢 \nPlease allow DMs from this server or contact a team member.";
+      } else {
+        channelMessage = 'Oops something went wrong. Please DM a team member.';
+        dmStatusMessage = '';
+      }
+    } finally {
+      await interaction.reply(channelMessage + dmStatusMessage);
     }
   }
-}
+};

@@ -30,7 +30,7 @@ module.exports = {
     let userHasAccess = false;
     const { username, discriminator, id } = interaction.user;
     const errLogChannel = client.channels.cache.get(process.env.ERROR_LOGS_CHANNEL);
-    const accessRole = interaction.guild.roles.cache.find(r => r.name === process.env.WAITLIST_ROLE);
+    const accessRole = interaction.guild.roles.cache.find(r => r.name === process.env.FEEDBACK_ROLE);
 
     // All DB interactions
     try {

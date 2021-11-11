@@ -23,7 +23,7 @@ module.exports = {
     }
 
     const guild = client.guilds.cache.get(process.env.GUILD_ID);
-    const accessRole = guild.roles.cache.find(r => r.name === process.env.WAITLIST_ROLE);
+    const accessRole = guild.roles.cache.find(r => r.name === process.env.FEEDBACK_ROLE);
     const waitlistChannel = client.channels.cache.get(process.env.WAITLIST_CHANNEL);
     const feedbackChannel = client.channels.cache.get(process.env.FEEDBACK_CHANNEL);
     const errLogChannel = client.channels.cache.get(process.env.ERROR_LOGS_CHANNEL);

@@ -11,7 +11,8 @@ module.exports = {
   async execute(interaction) {
     // Check if command sent in correct channel
     if (interaction.channelId !== process.env.WAITLIST_CHANNEL) {
-      await interaction.reply('Only use this command in the waitlist channel');
+      const waitlistChannel = client.channels.cache.get(process.env.WAITLIST_CHANNEL);
+      await interaction.reply(`Only use this command in ${waitlistChannel}`);
       return;
     }
 
@@ -92,7 +93,7 @@ module.exports = {
         dmToUser = `You now have access to the SimpleFi app  🥳  Launch it on https://simplefi.finance using this passcode: ${newUser.dataValues.passCode}`;
         roleStatusMessage = "\nYou also have access to the beta-testers channel now. Please give us your feedback there - it may earn you some rewards  😉 🐳";
       } else {
-        channelMessage = `Hi ${interaction.user}, you're on the waiting list and will have access soon!`;
+        channelMessage = `Hi ${interaction.user}, you're on the waiting list and will have access soon! `;
         dmStatusMessage = 'Check your DMs for wen access!  👀';
         dmToUser = `You're on the waiting list! Your current position is No.${userPosition + 1 - accessSize}`;
         roleStatusMessage = '';

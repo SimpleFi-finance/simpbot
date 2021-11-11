@@ -25,6 +25,7 @@ module.exports = {
     const guild = client.guilds.cache.get(process.env.GUILD_ID);
     const accessRole = guild.roles.cache.find(r => r.name === process.env.WAITLIST_ROLE);
     const waitlistChannel = client.channels.cache.get(process.env.WAITLIST_CHANNEL);
+    const feedbackChannel = client.channels.cache.get(process.env.FEEDBACK_CHANNEL);
     const errLogChannel = client.channels.cache.get(process.env.ERROR_LOGS_CHANNEL);
     let
       currAccessSize,
@@ -74,7 +75,7 @@ module.exports = {
         console.error(' ---> error fetching user Id', error); // eslint-disable-line no-console
       }
       rolePromises.push(member.roles.add(accessRole));
-      messagePromises.push(member.send(`Good news ${member}, you now have access to the beta! Launch the app on https://simplefi.finance. Your access code is ${newBetaUser.passCode} \nYou also have access to the private #beta-testers channel. Please leave your feedback, there it may earn you some rewards  😉 🐳`));
+      messagePromises.push(member.send(`Good news ${member}, you now have access to the beta! Launch the app on https://simplefi.finance. Your access code is ${newBetaUser.passCode} \nYou also have access to the private ${feedbackChannel} channel. Please leave your feedback there, it may earn you some rewards  😉 🐳`));
     }
 
     const settledMessagePromises = await Promise.allSettled(messagePromises);

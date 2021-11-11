@@ -1,33 +1,33 @@
-const client = require('../client');
-const { Users, Lists } = require('../db');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const generator = require('generate-password');
+const client = require('../client');
+const { Users, Lists } = require('../db');
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('waitlist')
-		.setDescription('Adds you to waitlist and tells you your position'),
+  data: new SlashCommandBuilder()
+    .setName('waitlist')
+    .setDescription('Adds you to waitlist and tells you your position'),
 
-	async execute(interaction) {
-
-    //Check if command sent in correct channel
+  async execute(interaction) {
+    // Check if command sent in correct channel
     if (interaction.channelId !== process.env.WAITLIST_CHANNEL) {
-      await interaction.reply(`Only use this command in the waitlist channel`);
+      await interaction.reply('Only use this command in the waitlist channel');
       return;
     }
 
-    let user,
-        newUser,
-        users,
-        userPosition,
-        accessSize,
-        channelMessage,
-        dmStatusMessage,
-        roleStatusMessage,
-        dmToUser,
-        userHasRole;
+    let
+      user,
+      newUser,
+      users,
+      userPosition,
+      accessSize,
+      channelMessage,
+      dmStatusMessage,
+      roleStatusMessage,
+      dmToUser,
+      userHasRole;
     let userHasAccess = false;
-    const {username, discriminator, id} = interaction.user;
+    const { username, discriminator, id } = interaction.user;
     const errLogChannel = client.channels.cache.get(process.env.ERROR_LOGS_CHANNEL);
     const accessRole = interaction.guild.roles.cache.find(r => r.name === process.env.WAITLIST_ROLE);
 
@@ -36,7 +36,7 @@ module.exports = {
       const waitlist = await Lists.findOne({ where: { name: process.env.WAITLIST_NAME } });
       accessSize = waitlist.dataValues.size;
 
-      //Check if user already exists or create one if not
+      // Check if user already exists or create one if not
       user = await Users.findOne({ where: { handle: username + discriminator } });
       if (!user) {
         const passCode = generator.generate({
@@ -47,7 +47,7 @@ module.exports = {
         newUser = await Users.create({
           handle: `${username}${discriminator}`,
           userId: id,
-          passCode: passCode
+          passCode
         });
       }
   

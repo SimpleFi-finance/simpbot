@@ -30,6 +30,7 @@ module.exports = {
     let userHasAccess = false;
     const { username, discriminator, id } = interaction.user;
     const errLogChannel = client.channels.cache.get(process.env.ERROR_LOGS_CHANNEL);
+    const feedbackChannel = client.channels.cache.get(process.env.FEEDBACK_CHANNEL);
     const accessRole = interaction.guild.roles.cache.find(r => r.name === process.env.FEEDBACK_ROLE);
 
     // All DB interactions
@@ -78,7 +79,7 @@ module.exports = {
         channelMessage = `${interaction.user} you already have access silly! `;
         dmStatusMessage = 'Check your DMs for instructions  👀';
         dmToUser = `You already have access and your code is ${user.dataValues.passCode}. Launch the app on https://simplefi.finance. `;
-        roleStatusMessage = "\nRemember you can now leave feedback on the private #beta-testers channel. It may earn you some rewards  😉 🐳";
+        roleStatusMessage = `\nRemember you can now leave feedback on the private ${feedbackChannel} channel. It may earn you some rewards  😉 🐳`;
       } else {
         channelMessage = `${interaction.user} you're already on the waiting list. `;
         dmStatusMessage = 'Check your DMs for wen access!  👀';

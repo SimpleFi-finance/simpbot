@@ -92,7 +92,7 @@ module.exports = {
         channelMessage = `Hi ${interaction.user}, you're one of the lucky ones! `;
         dmStatusMessage = 'Check your DMs for instructions  👀';
         dmToUser = `You now have access to the SimpleFi app  🥳  Launch it on https://simplefi.finance using this passcode: ${newUser.dataValues.passCode}`;
-        roleStatusMessage = "\nYou also have access to the beta-testers channel now. Please give us your feedback there - it may earn you some rewards  😉 🐳";
+        roleStatusMessage = `\nYou also have access to the ${feedbackChannel} channel now. Please give us your feedback there - it may earn you some rewards  😉 🐳`;
       } else {
         channelMessage = `Hi ${interaction.user}, you're on the waiting list and will have access soon! `;
         dmStatusMessage = 'Check your DMs for wen access!  👀';

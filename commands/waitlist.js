@@ -39,7 +39,7 @@ module.exports = {
       accessSize = waitlist.dataValues.size;
 
       // Check if user already exists or create one if not
-      user = await Users.findOne({ where: { handle: username + discriminator } });
+      user = await Users.findOne({ where: { userId: id } });
       if (!user) {
         const passCode = generator.generate({
           length: 9,

@@ -22,6 +22,7 @@ Admin controls (prepend admin prefix):
 - get-waitlist: get info on the current state of the waiting list
 - increase-beta {number}: increases the size of the beta access list and notifies users of their access codes
 - special-access {user IDs seperated by spaces}: gives beta access to arbitrary users
+- give-role: will trigger a series of prompts from the bot asking for the target role, user IDs (separate with spaces), channel to post in and an optional thank you message.
 
 ## Environment
 Create a .env file with the following information:

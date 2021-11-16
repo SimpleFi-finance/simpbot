@@ -46,8 +46,14 @@ module.exports = {
 
           channelCollector.on('collect', async channelReply => {
             roleArguments.targetChannel = client.channels.cache.get(channelReply.content);
+            const permissionToPostInChannel = guild.me.permissionsIn(roleArguments.targetChannel).has('SEND_MESSAGES');
+
             if (!roleArguments.targetChannel) {
               message.author.send(`Sorry, something went wrong finding the ${channelReply.content} channel. Try again  😞`);
+              return;
+            }
+            if (!permissionToPostInChannel) {
+              message.author.send(`I don't have the permission to post in that channel, sorry  😞  Please give me access and try again!`);
               return;
             }
             await IDReply.reply('Thanks message?');

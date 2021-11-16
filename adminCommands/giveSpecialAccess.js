@@ -30,6 +30,14 @@ module.exports = {
     let
       allUsers;
 
+    // Permissions check
+    const permissionToPostInWaitlist = guild.me.permissionsIn(waitlistChannel).has('SEND_MESSAGES');
+    const permissionToPostInLogs = guild.me.permissionsIn(errLogChannel).has('SEND_MESSAGES');
+    if (!permissionToPostInWaitlist || !permissionToPostInLogs) {
+      message.author.send(`Please give me access to both the Waitlist (id: ${process.env.WAITLIST_CHANNEL}) and Error Log (id: ${process.env.ERROR_LOGS_CHANNEL}) channels and try again!`);
+      return;
+    }
+
     // All DB interactions
     try {
       allUsers = await Users.findAll({

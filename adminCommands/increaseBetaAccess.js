@@ -10,7 +10,9 @@ function filterRejectedPromises(promises, users) {
   });
   return rejectedPromises;
 }
-
+// TODO: test permissions checks
+// TODO: debug Discord id fetching, exp. when user left or no longer exists
+// TODO: amend DB when user no longer exists
 module.exports = {
   name: 'increase-beta',
   description: 'Increase beta access list size',

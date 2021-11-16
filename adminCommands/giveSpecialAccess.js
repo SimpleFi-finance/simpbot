@@ -56,12 +56,12 @@ module.exports = {
       let member;
       try {
         member = await guild.members.fetch(specialUser.userId);
+        rolePromises.push(member.roles.add(accessRole));
+        specialAccessMessagePromises.push(member.send(`Good news ${member}, you now have access to the beta! Launch the app on https://simplefi.finance. Your access code is ${specialUser.passCode} \nYou also have access to the private ${feedbackChannel} channel. Please leave your feedback there, it may earn you some rewards  😉 🐳`));
       } catch (error) {
         message.author.send(`There was an error fetching <@${specialUser.userId}>'s data from Discord`);
         console.error(' ---> error fetching user Id', error); // eslint-disable-line no-console
       }
-      rolePromises.push(member.roles.add(accessRole));
-      specialAccessMessagePromises.push(member.send(`Good news ${member}, you now have access to the beta! Launch the app on https://simplefi.finance. Your access code is ${specialUser.passCode} \nYou also have access to the private ${feedbackChannel} channel. Please leave your feedback there, it may earn you some rewards  😉 🐳`));
     }
 
     // Deal with users who haven't yet signed up to the waitlist

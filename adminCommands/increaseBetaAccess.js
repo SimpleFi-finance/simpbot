@@ -10,8 +10,7 @@ function filterRejectedPromises(promises, users) {
   });
   return rejectedPromises;
 }
-// TODO: debug Discord id fetching, exp. when user left or no longer exists
-// TODO: amend DB when user no longer exists
+
 module.exports = {
   name: 'increase-beta',
   description: 'Increase beta access list size',
@@ -70,7 +69,7 @@ module.exports = {
       message.author.send(`Something went wrong with the DB - no DMs sent or roles added: \nerror: ${error.name} \nmessage: ${error.message}`);
       return;
     }
-    // TODO: message all existing beta-testers to say hi to the new ones? Tell them new version?
+
     // const currBetaUsers = allUsers.slice(0, currAccessSize);
     const newBetaUsers = allUsers.slice(currAccessSize, newAccessSize);
 
@@ -78,12 +77,18 @@ module.exports = {
     const rolePromises = [];
     const messagePromises = [];
     const departedMembers = [];
+    const priorAccessMembers = [];
     for (const newBetaUser of newBetaUsers) {
       const member = guild.members.cache.get(newBetaUser.userId);
       if (member) {
-        // TODO: check if was already given access by role - also in /waitlist
-        rolePromises.push(member.roles.add(accessRole));
-        messagePromises.push(member.send(`Good news ${member}, you now have access to the beta! Launch the app on https://simplefi.finance. Your access code is ${newBetaUser.passCode} \nYou also have access to the private ${feedbackChannel} channel. Please leave your feedback there, it may earn you some rewards  😉 🐳`));
+        // Check if user was already given role - e.g. through special access and don't message if so
+        const userHasRole = member.roles.cache.some(role => role.name === accessRole.name);
+        if (!userHasRole) {
+          rolePromises.push(member.roles.add(accessRole));
+          messagePromises.push(member.send(`Good news ${member}, you now have access to the beta! Launch the app on https://simplefi.finance. Your access code is ${newBetaUser.passCode} \nYou also have access to the private ${feedbackChannel} channel. Please leave your feedback there, it may earn you some rewards  😉 🐳`));
+        } else {
+          priorAccessMembers.push(newBetaUser.userId);
+        }
       } else {
         departedMembers.push(newBetaUser.userId);
       }
@@ -121,6 +126,6 @@ module.exports = {
     }
 
     // conclusion message
-    message.author.send(`Access increased to ${newAccessSize} from ${currAccessSize}! \nThere were ${rejectedMessagePromises.length} DM errors, ${rejectedRolePromises.length} role errors and ${departedMembers.length} departed errors.${(rejectedMessagePromises.length || rejectedRolePromises.length || departedMembers.length) ? ' Check the logs channel for details.' : ''}`);
+    message.author.send(`Access increased to ${newAccessSize} from ${currAccessSize}! ${priorAccessMembers.length ? `\n${priorAccessMembers.length} users already had access: <@${priorAccessMembers.join('>,<@')}>` : ''} \nThere were ${rejectedMessagePromises.length} DM errors, ${rejectedRolePromises.length} role errors and ${departedMembers.length} departed errors.${(rejectedMessagePromises.length || rejectedRolePromises.length || departedMembers.length) ? ' Check the logs channel for details.' : ''}`);
   }
 };

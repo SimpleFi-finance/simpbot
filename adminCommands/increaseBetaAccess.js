@@ -77,16 +77,16 @@ module.exports = {
     // Set up add roles and send DMs
     const rolePromises = [];
     const messagePromises = [];
+    const departedMembers = [];
     for (const newBetaUser of newBetaUsers) {
-      let member;
-      try {
-        member = await guild.members.fetch(newBetaUser.userId);
-      } catch (error) {
-        message.author.send(`There was an error fetching <@${newBetaUser.userId}>'s data from Discord`);
-        console.error(' ---> error fetching user Id', error); // eslint-disable-line no-console
+      const member = guild.members.cache.get(newBetaUser.userId);
+      if (member) {
+        // TODO: check if was already given access by role - also in /waitlist
+        rolePromises.push(member.roles.add(accessRole));
+        messagePromises.push(member.send(`Good news ${member}, you now have access to the beta! Launch the app on https://simplefi.finance. Your access code is ${newBetaUser.passCode} \nYou also have access to the private ${feedbackChannel} channel. Please leave your feedback there, it may earn you some rewards  😉 🐳`));
+      } else {
+        departedMembers.push(newBetaUser.userId);
       }
-      rolePromises.push(member.roles.add(accessRole));
-      messagePromises.push(member.send(`Good news ${member}, you now have access to the beta! Launch the app on https://simplefi.finance. Your access code is ${newBetaUser.passCode} \nYou also have access to the private ${feedbackChannel} channel. Please leave your feedback there, it may earn you some rewards  😉 🐳`));
     }
 
     const settledMessagePromises = await Promise.allSettled(messagePromises);
@@ -114,7 +114,13 @@ module.exports = {
         errLogChannel.send(`command: increase-beta \ninternal code: assign role issue \nuser: <@${rejectedPromise.user.userId}> \nerror name: ${rejectedPromise.reason.name} \nerror message: ${rejectedPromise.reason.message} \n---`);
       }
     }
+
+    // Log departed
+    if (departedMembers.length) {
+      errLogChannel.send(`command: increase-beta \ninternal code: departed members issue \nusers: <@${departedMembers.join('>,<@')}> \nerror message: Users have left the server or deleted their accounts \n---`);
+    }
+
     // conclusion message
-    message.author.send(`Access increased to ${newAccessSize} from ${currAccessSize}! \nThere were ${rejectedMessagePromises.length} DM errors and ${rejectedRolePromises.length} role errors.${(rejectedMessagePromises.length || rejectedRolePromises.length) ? ' Check the logs channel for details.' : ''}`);
+    message.author.send(`Access increased to ${newAccessSize} from ${currAccessSize}! \nThere were ${rejectedMessagePromises.length} DM errors, ${rejectedRolePromises.length} role errors and ${departedMembers.length} departed errors.${(rejectedMessagePromises.length || rejectedRolePromises.length || departedMembers.length) ? ' Check the logs channel for details.' : ''}`);
   }
 };

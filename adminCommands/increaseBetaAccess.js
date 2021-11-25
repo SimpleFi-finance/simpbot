@@ -10,7 +10,6 @@ function filterRejectedPromises(promises, users) {
   });
   return rejectedPromises;
 }
-// TODO: test permissions checks
 // TODO: debug Discord id fetching, exp. when user left or no longer exists
 // TODO: amend DB when user no longer exists
 module.exports = {
@@ -36,8 +35,10 @@ module.exports = {
     // Permissions check
     const permissionToPostInWaitlist = guild.me.permissionsIn(waitlistChannel).has('SEND_MESSAGES');
     const permissionToPostInLogs = guild.me.permissionsIn(errLogChannel).has('SEND_MESSAGES');
-    if (!permissionToPostInWaitlist || !permissionToPostInLogs) {
-      message.author.send(`Please give me access to both the Waitlist (id: ${process.env.WAITLIST_CHANNEL}) and Error Log (id: ${process.env.ERROR_LOGS_CHANNEL}) channels and try again!`);
+    const addedToWaitlistChannel = waitlistChannel.members.get(guild.me.id) ? true : false;
+    const addedToLogsChannel = errLogChannel.members.get(guild.me.id) ? true : false;
+    if (!permissionToPostInWaitlist || !permissionToPostInLogs || !addedToWaitlistChannel || !addedToLogsChannel) {
+      message.author.send(`I don't have permission to send messages or haven't been added to the waitlist channel (id: ${process.env.WAITLIST_CHANNEL}) and/or the Error Log channel (id: ${process.env.ERROR_LOGS_CHANNEL}). Please check and try again!`);
       return;
     }
 

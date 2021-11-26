@@ -46,18 +46,18 @@ module.exports = {
 
           channelCollector.on('collect', async channelReply => {
             roleArguments.targetChannel = client.channels.cache.get(channelReply.content);
-            const permissionToPostInChannel = guild.me.permissionsIn(roleArguments.targetChannel).has('SEND_MESSAGES');
-            const addedToChannel = roleArguments.targetChannel.members.get(guild.me.id) ? true : false;
-
             if (!roleArguments.targetChannel) {
               message.author.send(`Sorry, something went wrong finding the ${channelReply.content} channel. Try again  😞`);
               return;
             }
+
+            const permissionToPostInChannel = guild.me.permissionsIn(roleArguments.targetChannel).has('SEND_MESSAGES');
+            const addedToChannel = roleArguments.targetChannel.members.get(guild.me.id) ? true : false;
             if (!permissionToPostInChannel || !addedToChannel) {
               message.author.send(`I either don't have permission to post in that channel or I haven't been added to it, sorry  😞  Please give me access and try again!`);
               return;
             }
-            await IDReply.reply('Thanks message?');
+            await channelReply.reply('Thanks message?');
             const thanksMsgCollector = message.channel.createMessageCollector({ filter, max: 1, time: 90000, errors: ['time'] });
 
             thanksMsgCollector.on('collect', async thanksMsgReply => {

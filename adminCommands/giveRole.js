@@ -50,7 +50,14 @@ module.exports = {
               message.author.send(`Sorry, something went wrong finding the ${channelReply.content} channel. Try again  😞`);
               return;
             }
-            await IDReply.reply('Thanks message?');
+
+            const permissionToPostInChannel = guild.me.permissionsIn(roleArguments.targetChannel).has('SEND_MESSAGES');
+            const addedToChannel = roleArguments.targetChannel.members.get(guild.me.id) ? true : false;
+            if (!permissionToPostInChannel || !addedToChannel) {
+              message.author.send(`I either don't have permission to post in that channel or I haven't been added to it, sorry  😞  Please give me access and try again!`);
+              return;
+            }
+            await channelReply.reply('Thanks message?');
             const thanksMsgCollector = message.channel.createMessageCollector({ filter, max: 1, time: 90000, errors: ['time'] });
 
             thanksMsgCollector.on('collect', async thanksMsgReply => {

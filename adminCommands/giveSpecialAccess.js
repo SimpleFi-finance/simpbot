@@ -21,7 +21,7 @@ module.exports = {
       message.author.send('Naughty, naughty!');
       return;
     }
-
+    // TODO: add fail-safe if guild, role or channels can't be found
     const guild = client.guilds.cache.get(process.env.GUILD_ID);
     const accessRole = guild.roles.cache.find(r => r.name === process.env.FEEDBACK_ROLE);
     const waitlistChannel = client.channels.cache.get(process.env.WAITLIST_CHANNEL);
@@ -29,6 +29,16 @@ module.exports = {
     const errLogChannel = client.channels.cache.get(process.env.ERROR_LOGS_CHANNEL);
     let
       allUsers;
+
+    // Permissions and access check
+    const permissionToPostInWaitlist = guild.me.permissionsIn(waitlistChannel).has('SEND_MESSAGES');
+    const permissionToPostInLogs = guild.me.permissionsIn(errLogChannel).has('SEND_MESSAGES');
+    const addedToWaitlistChannel = waitlistChannel.members.get(guild.me.id) ? true : false;
+    const addedToLogsChannel = errLogChannel.members.get(guild.me.id) ? true : false;
+    if (!permissionToPostInWaitlist || !permissionToPostInLogs || !addedToWaitlistChannel || !addedToLogsChannel) {
+      message.author.send(`I don't have permission to send messages or haven't been added to the waitlist channel (id: ${process.env.WAITLIST_CHANNEL}) and/or the Error Log channel (id: ${process.env.ERROR_LOGS_CHANNEL}). Please check and try again!`);
+      return;
+    }
 
     // All DB interactions
     try {

@@ -22,6 +22,7 @@ module.exports = {
       return;
     }
 
+    // TODO: add fail-safe if guild, role or channels can't be found
     const guild = client.guilds.cache.get(process.env.GUILD_ID);
     const accessRole = guild.roles.cache.find(r => r.name === process.env.FEEDBACK_ROLE);
     const waitlistChannel = client.channels.cache.get(process.env.WAITLIST_CHANNEL);
@@ -30,6 +31,16 @@ module.exports = {
     let
       currAccessSize,
       allUsers;
+
+    // Permissions check
+    const permissionToPostInWaitlist = guild.me.permissionsIn(waitlistChannel).has('SEND_MESSAGES');
+    const permissionToPostInLogs = guild.me.permissionsIn(errLogChannel).has('SEND_MESSAGES');
+    const addedToWaitlistChannel = waitlistChannel.members.get(guild.me.id) ? true : false;
+    const addedToLogsChannel = errLogChannel.members.get(guild.me.id) ? true : false;
+    if (!permissionToPostInWaitlist || !permissionToPostInLogs || !addedToWaitlistChannel || !addedToLogsChannel) {
+      message.author.send(`I don't have permission to send messages or haven't been added to the waitlist channel (id: ${process.env.WAITLIST_CHANNEL}) and/or the Error Log channel (id: ${process.env.ERROR_LOGS_CHANNEL}). Please check and try again!`);
+      return;
+    }
 
     // All DB interactions
     try {
@@ -59,23 +70,29 @@ module.exports = {
       message.author.send(`Something went wrong with the DB - no DMs sent or roles added: \nerror: ${error.name} \nmessage: ${error.message}`);
       return;
     }
-    // TODO: message all existing beta-testers to say hi to the new ones? Tell them new version?
+
     // const currBetaUsers = allUsers.slice(0, currAccessSize);
     const newBetaUsers = allUsers.slice(currAccessSize, newAccessSize);
 
     // Set up add roles and send DMs
     const rolePromises = [];
     const messagePromises = [];
+    const departedMembers = [];
+    const priorAccessMembers = [];
     for (const newBetaUser of newBetaUsers) {
-      let member;
-      try {
-        member = await guild.members.fetch(newBetaUser.userId);
-      } catch (error) {
-        message.author.send(`There was an error fetching <@${newBetaUser.userId}>'s data from Discord`);
-        console.error(' ---> error fetching user Id', error); // eslint-disable-line no-console
+      const member = guild.members.cache.get(newBetaUser.userId);
+      if (member) {
+        // Check if user was already given role - e.g. through special access and don't message if so
+        const userHasRole = member.roles.cache.some(role => role.name === accessRole.name);
+        if (!userHasRole) {
+          rolePromises.push(member.roles.add(accessRole));
+          messagePromises.push(member.send(`Good news ${member}, you now have access to the beta! Launch the app on https://simplefi.finance. Your access code is ${newBetaUser.passCode} \nYou also have access to the private ${feedbackChannel} channel. Please leave your feedback there, it may earn you some rewards  😉 🐳`));
+        } else {
+          priorAccessMembers.push(newBetaUser.userId);
+        }
+      } else {
+        departedMembers.push(newBetaUser.userId);
       }
-      rolePromises.push(member.roles.add(accessRole));
-      messagePromises.push(member.send(`Good news ${member}, you now have access to the beta! Launch the app on https://simplefi.finance. Your access code is ${newBetaUser.passCode} \nYou also have access to the private ${feedbackChannel} channel. Please leave your feedback there, it may earn you some rewards  😉 🐳`));
     }
 
     const settledMessagePromises = await Promise.allSettled(messagePromises);
@@ -103,7 +120,13 @@ module.exports = {
         errLogChannel.send(`command: increase-beta \ninternal code: assign role issue \nuser: <@${rejectedPromise.user.userId}> \nerror name: ${rejectedPromise.reason.name} \nerror message: ${rejectedPromise.reason.message} \n---`);
       }
     }
+
+    // Log departed
+    if (departedMembers.length) {
+      errLogChannel.send(`command: increase-beta \ninternal code: departed members issue \nusers: <@${departedMembers.join('>,<@')}> \nerror message: Users have left the server or deleted their accounts \n---`);
+    }
+
     // conclusion message
-    message.author.send(`Access increased to ${newAccessSize} from ${currAccessSize}! \nThere were ${rejectedMessagePromises.length} DM errors and ${rejectedRolePromises.length} role errors.${(rejectedMessagePromises.length || rejectedRolePromises.length) ? ' Check the logs channel for details.' : ''}`);
+    message.author.send(`Access increased to ${newAccessSize} from ${currAccessSize}! ${priorAccessMembers.length ? `\n${priorAccessMembers.length} users already had access: <@${priorAccessMembers.join('>,<@')}>` : ''} \nThere were ${rejectedMessagePromises.length} DM errors, ${rejectedRolePromises.length} role errors and ${departedMembers.length} departed errors.${(rejectedMessagePromises.length || rejectedRolePromises.length || departedMembers.length) ? ' Check the logs channel for details.' : ''}`);
   }
 };

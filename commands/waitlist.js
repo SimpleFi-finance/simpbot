@@ -25,8 +25,7 @@ module.exports = {
       channelMessage,
       dmStatusMessage,
       roleStatusMessage,
-      dmToUser,
-      userHasRole;
+      dmToUser;
     let userHasAccess = false;
     const { username, discriminator, id } = interaction.user;
     const errLogChannel = client.channels.cache.get(process.env.ERROR_LOGS_CHANNEL);
@@ -71,7 +70,10 @@ module.exports = {
       const targetUser = user ? user : newUser;
       return el.userId === targetUser.userId;
     });
-    if (userPosition + 1 <= accessSize) { userHasAccess = true; }
+
+    // Check if user is within access size, or was already given access role
+    const userHasRole = interaction.member.roles.cache.some(role => role.name === accessRole.name);
+    if (userPosition + 1 <= accessSize || userHasRole) { userHasAccess = true; }
 
     // Set channel and DM messages
     if (user) {
@@ -103,7 +105,6 @@ module.exports = {
 
     // Attempt add role
     if (userHasAccess) {
-      userHasRole = interaction.member.roles.cache.some(role => role.name === accessRole.name);
       if (!userHasRole) {
         try {
           await interaction.member.roles.add(accessRole);

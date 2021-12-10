@@ -24,6 +24,7 @@ module.exports = {
 
     // TODO: add fail-safe if guild, role or channels can't be found
     const guild = client.guilds.cache.get(process.env.GUILD_ID);
+    await guild.members.fetch(); // ensure the server has all the latest members in cache
     const accessRole = guild.roles.cache.find(r => r.name === process.env.FEEDBACK_ROLE);
     const waitlistChannel = client.channels.cache.get(process.env.WAITLIST_CHANNEL);
     const feedbackChannel = client.channels.cache.get(process.env.FEEDBACK_CHANNEL);

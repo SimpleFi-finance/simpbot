@@ -41,6 +41,7 @@ ERROR_LOGS_CHANNEL = <id of the channel used for logging errors>
 FEEDBACK_ROLE = <waitlist role name>
 ADMIN_ROLE = <Discord role authorised to use admin commands>
 ACCESS_SIZE = <initial size of access list>
+ALERTS_CHANNEL_ID = <id of the channel used for alerting>
 
 #db variables (Sequelize)
 DB_NAME = <db name>

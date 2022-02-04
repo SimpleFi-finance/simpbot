@@ -166,8 +166,8 @@ module.exports = {
     scheduledMessage.start();
   },
   startNegativeBalancesChecker: async function () {
-    // every day at 3:30am UTC
-    let scheduledChecker = new cron.CronJob("30 13 * * *", async () => {
+    // every day at 7:30am UTC
+    let scheduledChecker = new cron.CronJob("30 7 * * *", async () => {
       await checkNegativeBalances();
     });
     scheduledChecker.start();

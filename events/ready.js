@@ -23,9 +23,10 @@ module.exports = {
       console.log(`${waitlist.dataValues.name} exists and has initial size ${waitlist.dataValues.size}`); // eslint-disable-line no-console
     }
 
-    // start cronjob to monitor subgraphs health
+    // start cronjobs to monitor subgraphs health and data validity
     const alerter = require(`../subgraph-ops/ops-alert`);
     await alerter.startSubgraphHealthTracker();
-    console.log("Alerter started");
+    await alerter.startNegativeBalancesChecker();
+    console.log("Alerters started");
   },
 };

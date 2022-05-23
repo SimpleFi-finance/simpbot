@@ -1,6 +1,7 @@
 simplefi-finance/oneinch
 simplefi-finance/aave-v2
 simplefi-finance/aave-v2-avalanche
+gvladika/simplefi-aave-polygon
 simplefi-finance/apeswap-polygon
 simplefi-finance/auroraswap-aurora
 simplefi-finance/biswap-bsc

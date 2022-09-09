@@ -54,6 +54,8 @@ simplefi-finance/sushiswap-farms-arbitrum
 simplefi-finance/sushiswap-farms-celo
 simplefi-finance/sushiswap-farms-gnosis
 simplefi-finance/sushiswap-farms-polygon
+simplefi-finance/synthetix-rewards
+simplefi-finance/synthetix-rewards-optimism
 simplefi-finance/traderjoe-avalanche
 simplefi-finance/traderjoe-data-avalanche
 simplefi-finance/traderjoe-farms-avalanche
